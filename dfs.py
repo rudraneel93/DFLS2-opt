@@ -92,17 +92,6 @@ def tsp_christofides(points):
     length = sum(euclidean_distance(points[tour[i]], points[tour[i+1]]) for i in range(len(tour)-1))
     return tour, length
 
-def tsp_simulated_annealing(points):
-    from networkx.algorithms.approximation import simulated_annealing_tsp
-    G = create_nx_graph(points)
-    # Initial cycle: node order ending at the start
-    init_cycle = list(G.nodes) + [list(G.nodes)[0]]
-    tour = simulated_annealing_tsp(G, weight='weight', init_cycle=init_cycle)
-    # Ensure closed tour
-    if tour[0] != tour[-1]:
-        tour.append(tour[0])
-    length = sum(euclidean_distance(points[tour[i]], points[tour[i+1]]) for i in range(len(tour)-1))
-    return tour, length
 
 # Utility: Can we skip this point?
 def can_skip(point, query, best_dist_so_far):
@@ -317,17 +306,12 @@ if __name__ == "__main__":
         time_dfls = time.time() - start_time
         print(f"DFLS 2-opt: length={length_dfls:.2f}, time={time_dfls:.2f}s")
 
+
         # Christofides
         start_time = time.time()
         tour_christo, length_christo = tsp_christofides(points)
         time_christo = time.time() - start_time
         print(f"Christofides: length={length_christo:.2f}, time={time_christo:.2f}s")
-
-        # Simulated Annealing
-        start_time = time.time()
-        tour_sa, length_sa = tsp_simulated_annealing(points)
-        time_sa = time.time() - start_time
-        print(f"Simulated Annealing: length={length_sa:.2f}, time={time_sa:.2f}s")
 
         results.append({
             'n': n_cities,
@@ -336,9 +320,7 @@ if __name__ == "__main__":
             'dfls_length': length_dfls,
             'dfls_time': time_dfls,
             'christo_length': length_christo,
-            'christo_time': time_christo,
-            'sa_length': length_sa,
-            'sa_time': time_sa
+            'christo_time': time_christo
         })
 
         # Visualization for each size (2D only)
@@ -349,49 +331,39 @@ if __name__ == "__main__":
             dfls_y = [points[i][1] for i in tour_dfls]
             christo_x = [points[i][0] for i in tour_christo]
             christo_y = [points[i][1] for i in tour_christo]
-            sa_x = [points[i][0] for i in tour_sa]
-            sa_y = [points[i][1] for i in tour_sa]
 
-            fig, axes = plt.subplots(2, 2, figsize=(14, 14))
+            fig, axes = plt.subplots(1, 3, figsize=(21, 7))
 
             # Greedy DFS plot
-            axes[0,0].plot(greedy_x, greedy_y, marker='o', color='purple', linewidth=2)
-            axes[0,0].scatter(greedy_x, greedy_y, color='red')
-            axes[0,0].set_title(f'Greedy DFS TSP Tour (n={n_cities})\nLength: {length_greedy:.2f}, Time: {time_greedy:.2f}s')
-            axes[0,0].set_xlabel('X')
-            axes[0,0].set_ylabel('Y')
-            axes[0,0].grid(True)
+            axes[0].plot(greedy_x, greedy_y, marker='o', color='purple', linewidth=2)
+            axes[0].scatter(greedy_x, greedy_y, color='red')
+            axes[0].set_title(f'Greedy DFS TSP Tour (n={n_cities})\nLength: {length_greedy:.2f}, Time: {time_greedy:.2f}s')
+            axes[0].set_xlabel('X')
+            axes[0].set_ylabel('Y')
+            axes[0].grid(True)
 
             # DFLS 2-opt plot
-            axes[0,1].plot(dfls_x, dfls_y, marker='o', color='orange', linewidth=2)
-            axes[0,1].scatter(dfls_x, dfls_y, color='brown')
-            axes[0,1].set_title(f'DFLS 2-opt TSP Tour (n={n_cities})\nLength: {length_dfls:.2f}, Time: {time_dfls:.2f}s')
-            axes[0,1].set_xlabel('X')
-            axes[0,1].set_ylabel('Y')
-            axes[0,1].grid(True)
+            axes[1].plot(dfls_x, dfls_y, marker='o', color='orange', linewidth=2)
+            axes[1].scatter(dfls_x, dfls_y, color='brown')
+            axes[1].set_title(f'DFLS 2-opt TSP Tour (n={n_cities})\nLength: {length_dfls:.2f}, Time: {time_dfls:.2f}s')
+            axes[1].set_xlabel('X')
+            axes[1].set_ylabel('Y')
+            axes[1].grid(True)
 
             # Christofides plot
-            axes[1,0].plot(christo_x, christo_y, marker='o', color='blue', linewidth=2)
-            axes[1,0].scatter(christo_x, christo_y, color='cyan')
-            axes[1,0].set_title(f'Christofides TSP Tour (n={n_cities})\nLength: {length_christo:.2f}, Time: {time_christo:.2f}s')
-            axes[1,0].set_xlabel('X')
-            axes[1,0].set_ylabel('Y')
-            axes[1,0].grid(True)
-
-            # Simulated Annealing plot
-            axes[1,1].plot(sa_x, sa_y, marker='o', color='green', linewidth=2)
-            axes[1,1].scatter(sa_x, sa_y, color='lime')
-            axes[1,1].set_title(f'Simulated Annealing TSP Tour (n={n_cities})\nLength: {length_sa:.2f}, Time: {time_sa:.2f}s')
-            axes[1,1].set_xlabel('X')
-            axes[1,1].set_ylabel('Y')
-            axes[1,1].grid(True)
+            axes[2].plot(christo_x, christo_y, marker='o', color='blue', linewidth=2)
+            axes[2].scatter(christo_x, christo_y, color='cyan')
+            axes[2].set_title(f'Christofides TSP Tour (n={n_cities})\nLength: {length_christo:.2f}, Time: {time_christo:.2f}s')
+            axes[2].set_xlabel('X')
+            axes[2].set_ylabel('Y')
+            axes[2].grid(True)
 
             plt.tight_layout()
             plt.show()
 
     # Print summary table
     print("\nTSP Benchmark Results:")
-    print("| n | Greedy DFS Length | Greedy DFS Time (s) | DFLS 2-opt Length | DFLS 2-opt Time (s) | Christofides Length | Christofides Time (s) | SimAnneal Length | SimAnneal Time (s) |")
-    print("|---|-------------------|---------------------|-------------------|---------------------|---------------------|-----------------------|------------------|--------------------|")
+    print("| n | Greedy DFS Length | Greedy DFS Time (s) | DFLS 2-opt Length | DFLS 2-opt Time (s) | Christofides Length | Christofides Time (s) |")
+    print("|---|-------------------|---------------------|-------------------|---------------------|---------------------|-----------------------|")
     for r in results:
-        print(f"| {r['n']} | {r['greedy_length']:.2f} | {r['greedy_time']:.2f} | {r['dfls_length']:.2f} | {r['dfls_time']:.2f} | {r['christo_length']:.2f} | {r['christo_time']:.2f} | {r['sa_length']:.2f} | {r['sa_time']:.2f} |")
+        print(f"| {r['n']} | {r['greedy_length']:.2f} | {r['greedy_time']:.2f} | {r['dfls_length']:.2f} | {r['dfls_time']:.2f} | {r['christo_length']:.2f} | {r['christo_time']:.2f} |")

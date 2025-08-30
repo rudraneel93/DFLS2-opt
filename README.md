@@ -1,50 +1,45 @@
+# Dynamic Focus Search & TSP Algorithms
 
-# Dynamic Focus Search (DFS) & Dynamic Focused Local Search (DFLS) Python Project
+This project implements, benchmarks, and visualizes advanced algorithms for nearest neighbor search and the Travelling Salesman Problem (TSP) in Python.
 
-This project implements and benchmarks:
-- The Dynamic Focus Search (DFS) algorithm for nearest neighbor search
-- A greedy DFS-based TSP solver
-- The novel Dynamic Focused Local Search (DFLS) 2-opt algorithm for large-scale TSP
+## Features
 
-## DFLS 2-opt: Motivation & Description
+- **Dynamic Focus Search (DFS)**: Fast nearest neighbor search with temporal locality, compared to naive linear scan.
+- **Greedy DFS TSP**: Heuristic TSP solver using DFS-based nearest neighbor.
+- **DFLS 2-opt TSP**: Efficient TSP solver for large n (≥100) using a dynamic focus region and 2-opt swaps.
+- **Christofides TSP**: Approximate TSP solver using NetworkX's Christofides algorithm.
+- **Benchmarking**: Performance and solution quality comparison for all algorithms on random datasets of size n=50, 200, 500.
+- **Visualization**: Side-by-side and grid visualizations of TSP tours for Greedy DFS, DFLS 2-opt, and Christofides algorithms.
+- **Correctness Checks**: Ensures DFS matches naive scan for nearest neighbor queries.
 
-Solving the Travelling Salesman Problem (TSP) for large numbers of cities is computationally challenging. Classic exact solvers are only practical for small n, while greedy heuristics are fast but often suboptimal. The **DFLS 2-opt** algorithm is designed to efficiently improve TSP tours for large n (≥100) by combining:
+## Usage
 
-1. **Greedy DFS Initialization:** Quickly generates an initial tour by always visiting the nearest unvisited city.
-2. **Dynamic Focused Local Search:** Iteratively applies 2-opt swaps, but restricts swaps to city pairs within a specified "focus region" (distance threshold). This dramatically reduces computation while targeting the most promising improvements.
+Run the main script:
 
-### How DFLS 2-opt Works
-1. Start with a greedy DFS tour.
-2. For each pair of cities (i, j) within the tour:
-    - If the distance between city i and city j is less than `focus_radius`, consider a 2-opt swap (reverse the segment between i+1 and j).
-    - Accept the swap if it reduces the total tour length.
-3. Repeat until no further improvements are found or a maximum number of iterations is reached.
+```bash
+python3 dfs.py
+```
 
-### Why DFLS 2-opt is Effective
-- **Scalability:** Focus region limits the number of swaps, making the algorithm fast for large n.
-- **Quality:** Produces tours significantly shorter than greedy DFS, as shown in benchmarks and visualizations.
-- **Novelty:** The dynamic focus region is a practical innovation for balancing speed and solution quality.
+Or, if using the provided virtual environment:
 
-## TSP Algorithm Comparison
+```bash
+./.venv-1/bin/python dfs.py
+```
 
-| Algorithm         | Tour Length (n=100) | Runtime (seconds) |
-|-------------------|--------------------|-------------------|
-| Greedy DFS        | 19843.78           | Fast              |
-| DFLS 2-opt        | 18096.97           | Fast              |
+## Output
+- Benchmark results for nearest neighbor search (DFS vs. Naive)
+- TSP tour lengths and runtimes for Greedy DFS, DFLS 2-opt, and Christofides
+- Visual comparison of TSP tours for each algorithm and city size
+- Summary table of results
 
-*Note: Both algorithms use the same set of 100 cities for fair comparison. DFLS 2-opt consistently produces shorter tours.*
-
-## How to Run
-
-1. Open the workspace in VS Code.
-2. Ensure Python and required extensions are installed.
-3. Run the main script to benchmark DFS, greedy DFS TSP, and DFLS 2-opt TSP.
+## Requirements
+- Python 3.8+
+- `matplotlib`, `networkx`
 
 ## Files
-- `dfs.py`: Main implementation and benchmarking script
-- `dsp_tsp.py`: Exact TSP solver for small n
-- `.github/copilot-instructions.md`: Copilot custom instructions
+- `dfs.py`: Main implementation, benchmarking, and visualization
+- `dsp_tsp.py`: (Optional) Placeholder for exact TSP solver
+- `README.md`: This file
 
----
-
-Feel free to modify or extend the project for your own experiments.
+## License
+MIT
