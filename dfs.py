@@ -5,27 +5,39 @@ def tsp_dfls_2opt(points, max_iter=10000, focus_radius=200):
     tour, tour_length = tsp_greedy_dfs(points)
     def dist(i, j):
         return euclidean_distance(points[i], points[j])
-    def tour_cost(tour):
-        return sum(dist(tour[i], tour[i+1]) for i in range(n)) + dist(tour[-1], tour[0])
+    # Precompute all distances for fast lookup
+    D = [[dist(i, j) for j in range(n)] for i in range(n)]
+
+    # Helper: compute cost of swapped segment only
+    def delta_2opt(tour, i, j):
+        a, b = tour[i], tour[i+1]
+        c, d = tour[j], tour[(j+1)%n]
+        # Remove edges (a-b) and (c-d), add (a-c) and (b-d)
+        return (D[a][c] + D[b][d]) - (D[a][b] + D[c][d])
+
+    total_cost = sum(D[tour[k]][tour[k+1]] for k in range(n)) + D[tour[-1]][tour[0]]
     improved = True
     iter_count = 0
+    max_iter = min(max_iter, 1000)  # Limit iterations for speed
     while improved and iter_count < max_iter:
         improved = False
         for i in range(n - 1):
             for j in range(i + 2, n):
                 # Focus region: only consider swaps if cities are close
-                if dist(tour[i], tour[j]) > focus_radius:
+                if D[tour[i]][tour[j]] > focus_radius:
                     continue
                 # 2-opt swap
-                new_tour = tour[:i+1] + tour[i+1:j+1][::-1] + tour[j+1:]
-                if tour_cost(new_tour) < tour_cost(tour):
-                    tour = new_tour
+                delta = delta_2opt(tour, i, j)
+                if delta < 0:
+                    # Perform swap
+                    tour[i+1:j+1] = reversed(tour[i+1:j+1])
+                    total_cost += delta
                     improved = True
                     break
             if improved:
                 break
         iter_count += 1
-    return tour, tour_cost(tour)
+    return tour, total_cost
 import random
 import math
 import time
@@ -286,9 +298,8 @@ if __name__ == "__main__":
         plt.tight_layout()
         plt.show()
 
-    # Benchmark for n=50, 200, 500 with visualizations
-
-    tsp_sizes = [50, 200, 500]
+    # Benchmark for n=50, 200, 500, 1000, 2000, 5000 with visualizations
+    tsp_sizes = [50, 200, 500, 1000, 2000, 5000]
     results = []
     for n_cities in tsp_sizes:
         print(f"\nBenchmarking TSP algorithms for n={n_cities}...")
@@ -306,12 +317,14 @@ if __name__ == "__main__":
         time_dfls = time.time() - start_time
         print(f"DFLS 2-opt: length={length_dfls:.2f}, time={time_dfls:.2f}s")
 
-
-        # Christofides
-        start_time = time.time()
-        tour_christo, length_christo = tsp_christofides(points)
-        time_christo = time.time() - start_time
-        print(f"Christofides: length={length_christo:.2f}, time={time_christo:.2f}s")
+        # Christofides (skip for n > 1000 for speed)
+        if n_cities <= 1000:
+            start_time = time.time()
+            tour_christo, length_christo = tsp_christofides(points)
+            time_christo = time.time() - start_time
+            print(f"Christofides: length={length_christo:.2f}, time={time_christo:.2f}s")
+        else:
+            tour_christo, length_christo, time_christo = None, None, None
 
         results.append({
             'n': n_cities,
@@ -329,41 +342,124 @@ if __name__ == "__main__":
             greedy_y = [points[i][1] for i in tour_greedy]
             dfls_x = [points[i][0] for i in tour_dfls]
             dfls_y = [points[i][1] for i in tour_dfls]
-            christo_x = [points[i][0] for i in tour_christo]
-            christo_y = [points[i][1] for i in tour_christo]
 
-            fig, axes = plt.subplots(1, 3, figsize=(21, 7))
-
-            # Greedy DFS plot
-            axes[0].plot(greedy_x, greedy_y, marker='o', color='purple', linewidth=2)
-            axes[0].scatter(greedy_x, greedy_y, color='red')
-            axes[0].set_title(f'Greedy DFS TSP Tour (n={n_cities})\nLength: {length_greedy:.2f}, Time: {time_greedy:.2f}s')
-            axes[0].set_xlabel('X')
-            axes[0].set_ylabel('Y')
-            axes[0].grid(True)
-
-            # DFLS 2-opt plot
-            axes[1].plot(dfls_x, dfls_y, marker='o', color='orange', linewidth=2)
-            axes[1].scatter(dfls_x, dfls_y, color='brown')
-            axes[1].set_title(f'DFLS 2-opt TSP Tour (n={n_cities})\nLength: {length_dfls:.2f}, Time: {time_dfls:.2f}s')
-            axes[1].set_xlabel('X')
-            axes[1].set_ylabel('Y')
-            axes[1].grid(True)
-
-            # Christofides plot
-            axes[2].plot(christo_x, christo_y, marker='o', color='blue', linewidth=2)
-            axes[2].scatter(christo_x, christo_y, color='cyan')
-            axes[2].set_title(f'Christofides TSP Tour (n={n_cities})\nLength: {length_christo:.2f}, Time: {time_christo:.2f}s')
-            axes[2].set_xlabel('X')
-            axes[2].set_ylabel('Y')
-            axes[2].grid(True)
-
-            plt.tight_layout()
+            if n_cities <= 1000:
+                christo_x = [points[i][0] for i in tour_christo] if tour_christo else None
+                christo_y = [points[i][1] for i in tour_christo] if tour_christo else None
+                fig, axes = plt.subplots(1, 3, figsize=(21, 7))
+                # Greedy DFS plot
+                axes[0].plot(greedy_x, greedy_y, marker='o', color='purple', linewidth=2)
+                axes[0].scatter(greedy_x, greedy_y, color='red')
+                axes[0].set_title(f'Greedy DFS TSP Tour (n={n_cities})\nLength: {length_greedy:.2f}, Time: {time_greedy:.2f}s')
+                axes[0].set_xlabel('X')
+                axes[0].set_ylabel('Y')
+                axes[0].grid(True)
+                # DFLS 2-opt plot
+                axes[1].plot(dfls_x, dfls_y, marker='o', color='orange', linewidth=2)
+                axes[1].scatter(dfls_x, dfls_y, color='brown')
+                axes[1].set_title(f'DFLS 2-opt TSP Tour (n={n_cities})\nLength: {length_dfls:.2f}, Time: {time_dfls:.2f}s')
+                axes[1].set_xlabel('X')
+                axes[1].set_ylabel('Y')
+                axes[1].grid(True)
+                # Christofides plot (only if available)
+                if christo_x and christo_y:
+                    axes[2].plot(christo_x, christo_y, marker='o', color='blue', linewidth=2)
+                    axes[2].scatter(christo_x, christo_y, color='cyan')
+                    axes[2].set_title(f'Christofides TSP Tour (n={n_cities})\nLength: {length_christo:.2f}, Time: {time_christo:.2f}s')
+                    axes[2].set_xlabel('X')
+                    axes[2].set_ylabel('Y')
+                    axes[2].grid(True)
+                else:
+                    axes[2].set_title('Christofides skipped (n > 1000)')
+                plt.tight_layout()
+                plt.show()
+            elif n_cities > 1000:
+                fig, axes = plt.subplots(1, 2, figsize=(14, 7))
+                # Greedy DFS plot
+                axes[0].plot(greedy_x, greedy_y, marker='o', color='purple', linewidth=2)
+                axes[0].scatter(greedy_x, greedy_y, color='red')
+                axes[0].set_title(f'Greedy DFS TSP Tour (n={n_cities})\nLength: {length_greedy:.2f}, Time: {time_greedy:.2f}s')
+                axes[0].set_xlabel('X')
+                axes[0].set_ylabel('Y')
+                axes[0].grid(True)
+                # DFLS 2-opt plot
+                axes[1].plot(dfls_x, dfls_y, marker='o', color='orange', linewidth=2)
+                axes[1].scatter(dfls_x, dfls_y, color='brown')
+                axes[1].set_title(f'DFLS 2-opt TSP Tour (n={n_cities})\nLength: {length_dfls:.2f}, Time: {time_dfls:.2f}s')
+                axes[1].set_xlabel('X')
+                axes[1].set_ylabel('Y')
+                axes[1].grid(True)
+                plt.tight_layout()
+                plt.show()
             plt.show()
+
+    # Additional visualizations: Tour length vs. runtime for each algorithm and city size
+
+    sizes = [r['n'] for r in results]
+    greedy_lengths = [r['greedy_length'] for r in results]
+    dfls_lengths = [r['dfls_length'] for r in results]
+    christo_lengths = [r['christo_length'] for r in results if r['christo_length'] is not None]
+    greedy_times = [r['greedy_time'] for r in results]
+    dfls_times = [r['dfls_time'] for r in results]
+    christo_times = [r['christo_time'] for r in results if r['christo_time'] is not None]
+
+    # Tour length vs. runtime scatter plot
+    plt.figure(figsize=(10, 6))
+    plt.scatter(greedy_times, greedy_lengths, color='purple', label='Greedy DFS', s=100)
+    plt.scatter(dfls_times, dfls_lengths, color='orange', label='DFLS 2-opt', s=100)
+    if christo_times and christo_lengths:
+        plt.scatter(christo_times, christo_lengths, color='blue', label='Christofides', s=100)
+    for i, n in enumerate(sizes):
+        plt.text(greedy_times[i], greedy_lengths[i], f'n={n}', fontsize=9, color='purple', ha='right')
+        plt.text(dfls_times[i], dfls_lengths[i], f'n={n}', fontsize=9, color='orange', ha='right')
+        if i < len(christo_times) and i < len(christo_lengths):
+            plt.text(christo_times[i], christo_lengths[i], f'n={sizes[i]}', fontsize=9, color='blue', ha='right')
+    plt.xlabel('Runtime (seconds)')
+    plt.ylabel('Tour Length')
+    plt.title('Tour Length vs. Runtime for TSP Algorithms')
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+
+    # Bar chart comparing tour lengths for all algorithms and sizes
+    import numpy as np
+    x = np.arange(len(sizes))
+    width = 0.25
+    plt.figure(figsize=(12, 6))
+    plt.bar(x - width, greedy_lengths, width, color='purple', label='Greedy DFS')
+    plt.bar(x, dfls_lengths, width, color='orange', label='DFLS 2-opt')
+    # Christofides bars only for sizes where data exists
+    if christo_lengths:
+        x_christo = np.arange(len(christo_lengths))
+        plt.bar(x_christo + width, christo_lengths, width, color='blue', label='Christofides')
+    plt.xticks(x, [f'n={n}' for n in sizes])
+    plt.ylabel('Tour Length')
+    plt.title('TSP Tour Length Comparison')
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+    # Bar chart comparing runtimes for all algorithms and sizes
+    plt.figure(figsize=(12, 6))
+    plt.bar(x - width, greedy_times, width, color='purple', label='Greedy DFS')
+    plt.bar(x, dfls_times, width, color='orange', label='DFLS 2-opt')
+    if christo_times:
+        x_christo = np.arange(len(christo_times))
+        plt.bar(x_christo + width, christo_times, width, color='blue', label='Christofides')
+    plt.xticks(x, [f'n={n}' for n in sizes])
+    plt.ylabel('Runtime (seconds)')
+    plt.title('TSP Algorithm Runtime Comparison')
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
 
     # Print summary table
     print("\nTSP Benchmark Results:")
     print("| n | Greedy DFS Length | Greedy DFS Time (s) | DFLS 2-opt Length | DFLS 2-opt Time (s) | Christofides Length | Christofides Time (s) |")
     print("|---|-------------------|---------------------|-------------------|---------------------|---------------------|-----------------------|")
     for r in results:
-        print(f"| {r['n']} | {r['greedy_length']:.2f} | {r['greedy_time']:.2f} | {r['dfls_length']:.2f} | {r['dfls_time']:.2f} | {r['christo_length']:.2f} | {r['christo_time']:.2f} |")
+        christo_length_str = f"{r['christo_length']:.2f}" if r['christo_length'] is not None else "-"
+        christo_time_str = f"{r['christo_time']:.2f}" if r['christo_time'] is not None else "-"
+        print(f"| {r['n']} | {r['greedy_length']:.2f} | {r['greedy_time']:.2f} | {r['dfls_length']:.2f} | {r['dfls_time']:.2f} | {christo_length_str} | {christo_time_str} |")
