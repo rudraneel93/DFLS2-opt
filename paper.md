@@ -147,6 +147,22 @@ DFLS2-opt offers a pragmatic hybrid approach that brings together depth-first tr
 
 We invite the community to validate, critique, and extend the work via the repository and Zenodo record.
 
+## Expanded Research Discussion
+
+DFLS2-opt builds upon decades of research in combinatorial optimization, metaheuristics, and algorithm engineering. The algorithm’s design is informed by foundational work in local search (Johnson & McGeoch, 1997), metaheuristics (Glover & Kochenberger, 2003), and hybrid approaches (Talbi, 2009). The dynamic focus region concept is inspired by adaptive memory programming (Glover, 1996) and recent advances in reinforcement learning for combinatorial problems (Bengio et al., 2021). Our approach is motivated by the need for scalable, interpretable, and reproducible optimization tools, as highlighted in open science initiatives (Peng, 2011; Nosek et al., 2015).
+
+In our experiments, we observed that the modularity of DFLS2-opt enables rapid prototyping of new heuristics and integration with external solvers. For example, the algorithm can be extended to incorporate machine learning-based cost predictors (Khalil et al., 2016) or hybridized with population-based methods (Whitley et al., 2015). The benchmarking framework is designed to facilitate fair comparisons and reproducibility, following best practices in computational experiments (McGeoch, 2012; Hooker, 1994).
+
+DFLS2-opt’s adaptability makes it suitable for emerging applications such as vehicle routing with time windows (Solomon, 1987), large-scale scheduling (Pinedo, 2016), and network design (Magnanti & Wong, 1984). The open-source release encourages community-driven extensions, including integration with distributed computing frameworks (Dean & Ghemawat, 2008) and GPU acceleration (Kirk & Hwu, 2016).
+
+Future research directions include:
+- Extending DFLS2-opt to multi-objective and dynamic optimization problems (Deb, 2001; Miettinen, 1999).
+- Leveraging deep learning for heuristic generation (Vinyals et al., 2015; Kool et al., 2019).
+- Exploring parallel and distributed implementations for massive-scale instances (Bader & Madduri, 2008).
+- Investigating theoretical bounds and convergence properties (Papadimitriou & Steiglitz, 1998).
+
+The project aligns with the principles of open science, reproducibility, and community engagement. All code, data, and results are available for scrutiny and extension, supporting transparent research and collaborative development.
+
 # Acknowledgements & Contact
 
 This research was developed independently. The author thanks early testers and community members who provided feedback via GitHub issues. For correspondence: Rudraneel Das — https://github.com/rudraneel93 — Email: rudraneel93@gmail.com
@@ -156,4 +172,19 @@ This research was developed independently. The author thanks early testers and c
 - Knuth, D. E. (1997). The Art of Computer Programming, Volume 1: Fundamental Algorithms. Addison-Wesley.
 - Kirkpatrick, S., Gelatt, C. D., & Vecchi, M. P. (1983). Optimization by Simulated Annealing. Science, 220(4598), 671–680.
 - Hoos, H. H., & Stützle, T. (2004). Stochastic Local Search: Foundations and Applications. Elsevier.
-- Journal/benchmark datasets and code are included in the GitHub repository for reproducibility.
+- Johnson, D. S., & McGeoch, L. A. (1997). The Traveling Salesman Problem: A Case Study in Local Optimization. In E. H. L. Aarts & J. K. Lenstra (Eds.), Local Search in Combinatorial Optimization. Wiley.
+- Glover, F., & Kochenberger, G. A. (2003). Handbook of Metaheuristics. Springer.
+- Talbi, E.-G. (2009). Metaheuristics: From Design to Implementation. Wiley.
+- Glover, F. (1996). Tabu Search and Adaptive Memory Programming—Advances, Applications and Challenges. Interfaces in Computer Science and Operations Research, 1, 1–24.
+- Bengio, Y., Lodi, A., & Prouvost, A. (2021). Machine Learning for Combinatorial Optimization: A Methodological Tour. European Journal of Operational Research, 290(2), 405–421.
+- Peng, R. D. (2011). Reproducible Research in Computational Science. Science, 334(6060), 1226–1227.
+- Nosek, B. A., et al. (2015). Promoting an Open Research Culture. Science, 348(6242), 1422–1425.
+- Khalil, E. B., Le Bodic, P., Song, L., Nemhauser, G., & Dilkina, B. (2016). Learning to Branch in Mixed Integer Programming. In AAAI.
+- Whitley, D., et al. (2015). A Hybrid Genetic Algorithm for the Traveling Salesman Problem. In Proceedings of the Genetic and Evolutionary Computation Conference (GECCO).
+- McGeoch, C. C. (2012). A Guide to Experimental Algorithmics. Cambridge University Press.
+- Hooker, J. N. (1994). Needed: An Experimental Science of Algorithms. Operations Research, 42(2), 201–212.
+- Solomon, M. M. (1987). Algorithms for the Vehicle Routing and Scheduling Problems with Time Window Constraints. Operations Research, 35(2), 254–265.
+- Pinedo, M. (2016). Scheduling: Theory, Algorithms, and Systems. Springer.
+- Magnanti, T. L., & Wong, R. T. (1984). Network Design and Transportation Planning: Models and Algorithms. Transportation Science, 18(1), 1–55.
+- Dean, J., & Ghemawat, S. (2008). MapReduce: Simplified Data Processing on Large Clusters. Communications of the ACM, 51(1), 107–113.
+- Kirk, D. B., & Hwu, W.-M. (2016). Programming Massively Parallel Processors: A Hands-on Approach. Morgan
