@@ -1,21 +1,14 @@
 ---
-title: 'Dynamic Focus Search & Scalable TSP Algorithms: Efficient Large-Scale Optimization in Python'
-authors:
-  - name: Rudraneel Das
-    orcid: 0009-0009-6173-0262
-    affiliation: 1
-affiliations:
-  - name: Independent Researcher
-    index: 1
-date: 2025-09-01
-keywords:
-  - algorithms
-  - optimization
-  - travelling salesman problem
-  - data science
-  - python
-  - combinatorial optimization
-subject: Discrete Mathematics and Combinatorics
+# **Dynamic Focus Search & Scalable TSP Algorithms: Efficient Large-Scale Optimization in Python**
+
+**Author:** Rudraneel Das  
+**ORCID:** 0009-0009-6173-0262  
+**Affiliation:** Independent Researcher  
+**Date:** 2025-09-01  
+
+**Keywords:** algorithms, optimization, travelling salesman problem, data science, python, combinatorial optimization  
+**Subject:** Discrete Mathematics and Combinatorics
+
 ---
 
 # Summary
