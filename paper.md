@@ -113,10 +113,33 @@ Experiments were conducted on a workstation with 16GB RAM and a quad-core CPU. E
 | Christofides      | 14850     | 210         | 88%          | 6%                   | Linear      |
 | Random Hill-Climb | 15500     | 160         | 82%          | 10%                  | Superlinear |
 
-#### Discussion
+#### Expanded Analysis of Comparative Results
 
-DFLS2-opt demonstrates a strong balance between optimality, runtime, and robustness, outperforming classical DFS and greedy local search in most scenarios. Christofides' algorithm remains competitive but lacks the adaptive feedback and extensibility of DFLS2-opt. The modular design of DFLS2-opt allows for rapid integration of new heuristics and distributed extensions, making it suitable for both research and industrial deployment (see Talbi, 2009; Kirk & Hwu, 2016).
+- **DFLS2-opt**: Achieves the lowest average cost and highest robustness, with linear scalability. Its adaptive pruning and dynamic focus region allow it to avoid redundant exploration and converge quickly to high-quality solutions. The success rate is high, and the standard deviation is low, indicating consistent performance across runs and problem types. This makes DFLS2-opt especially suitable for large-scale and real-world logistics problems where reliability and efficiency are critical.
 
+- **Classical DFS**: While deterministic and exhaustive, classical DFS suffers from exponential runtime growth and high variability in solution quality. Its inability to prune effectively or leverage heuristics results in longer runtimes and less robust solutions, especially as problem size increases. This method is best reserved for small instances or as a baseline for completeness.
+
+- **Greedy Local Search**: Greedy approaches offer faster runtimes than DFS but can get trapped in local optima, leading to higher average costs and moderate robustness. Their superlinear scalability means performance degrades as instance size grows, and success rates are lower than DFLS2-opt or Christofides. Greedy methods are useful for quick approximations but lack the reliability of more advanced algorithms.
+
+- **Christofides Algorithm**: Christofides provides a strong balance between cost and runtime, with linear scalability and high success rates. However, it lacks the adaptive feedback and extensibility of DFLS2-opt, making it less flexible for custom heuristics or integration with modern metaheuristics. It remains a gold standard for TSP approximation but is outperformed by DFLS2-opt in robustness and extensibility.
+
+- **Random Hill-Climb**: This method is fast but less reliable, with higher variability and lower success rates. Its superlinear scalability and tendency to miss global optima make it less suitable for large or structured instances. It is best used for exploratory analysis or as a component in hybrid metaheuristics.
+
+#### Practical Implications
+
+The comparative results highlight the strengths of DFLS2-opt for practical deployment:
+- **Scalability**: Linear runtime growth enables application to very large datasets, such as city-scale logistics or national transportation networks.
+- **Robustness**: Low standard deviation and high success rate ensure reliable performance, critical for operational use in scheduling, routing, and resource allocation.
+- **Extensibility**: Modular design allows integration of new heuristics, distributed computing, and machine learning-based evaluators, supporting ongoing research and industrial innovation.
+
+#### Limitations and Future Directions
+
+While DFLS2-opt excels in many areas, further research is needed to:
+- Explore distributed and parallel implementations for even larger instances.
+- Integrate deep learning-based heuristics for dynamic and multi-objective optimization.
+- Benchmark against emerging metaheuristics and hybrid solvers in diverse domains.
+
+These directions will help further validate and extend the impact of DFLS2-opt in both academic and applied settings.
 # Applications
 
 DFLS2-opt is intentionally general-purpose. Example application scenarios include:
