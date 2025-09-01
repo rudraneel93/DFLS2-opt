@@ -8,6 +8,14 @@ affiliations:
   - name: Independent Researcher
     index: 1
 date: 2025-09-01
+keywords:
+  - algorithms
+  - optimization
+  - travelling salesman problem
+  - data science
+  - python
+  - combinatorial optimization
+subject: Algorithms
 ---
 
 # Summary
